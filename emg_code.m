@@ -7,20 +7,16 @@ else
     error('File not found');
 end
 
-% PREPROCESS
 Fs = 1000; % Sampling frequency
 Fc_high = 20; % High-pass filter cutoff frequency
 Fc_low = 499; % Low-pass filter cutoff frequency
 
-% high-pass filter
 [b_high, a_high] = butter(2, Fc_high/(Fs/2), 'high');
 filtered_emg = filtfilt(b_high, a_high, emg_signal);
 
-% low-pass filter
 [b_low, a_low] = butter(2, Fc_low/(Fs/2), 'low');
 filtered_emg = filtfilt(b_low, a_low, filtered_emg);
 
-% Extract features for each EMG signal
 features = zeros(size(emg_signal, 2), 8); 
 for i = 1:size(emg_signal, 2)
   features(i, 1) = calculate_max_fractal_length(emg_signal(:, i));
@@ -44,18 +40,15 @@ function mfl = calculate_max_fractal_length(signal)
   mfl = log10(sqrt(sum(diff_signal.^2) / (N-1)));
 end
 
-% Modified Mean Absolute Value (MMAV)
 function mmavg = calculate_mm_average(signal)
   window_size = 5; % Adjust window size as needed
   if length(signal) > 12
     mmavg = mean(abs(filtfilt(ones(1,window_size)/window_size, 1, signal)));
   else
-    mmavg = mean(abs(signal)); % If signal is too short, calculate mean absolute value without filtering
+    mmavg = mean(abs(signal)); 
   end
 end
 
-
-% Difference Absolute Standard Deviation Value (DASDV)
 function dasdv = calculate_dasdv(signal)
   mean_val = mean(signal);
   diff_from_mean = signal - mean_val;
